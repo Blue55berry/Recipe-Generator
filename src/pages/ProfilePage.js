@@ -5,6 +5,7 @@ import Loader from '../components/Loader';
 import { FaUser, FaEnvelope, FaUtensils, FaExclamationCircle } from 'react-icons/fa';
 
 const ProfilePage = () => {
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -127,6 +128,7 @@ const ProfilePage = () => {
                     placeholder="Your name"
                     value={formData.name}
                     onChange={onChange}
+                    disabled={!isEditing}
                   />
                 </div>
               </div>
@@ -169,6 +171,7 @@ const ProfilePage = () => {
                     checked={formData.dietary_preferences.includes(diet)}
                     onChange={() => handleDietaryToggle(diet)}
                     className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                    disabled={!isEditing}
                   />
                   <label htmlFor={`diet-${diet}`} className="ml-2 block text-sm text-gray-900 capitalize">
                     {diet.replace('-', ' ')}
@@ -193,6 +196,7 @@ const ProfilePage = () => {
                     checked={formData.allergies.includes(allergy)}
                     onChange={() => handleAllergyToggle(allergy)}
                     className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                    disabled={!isEditing}
                   />
                   <label htmlFor={`allergy-${allergy}`} className="ml-2 block text-sm text-gray-900 capitalize">
                     {allergy}
@@ -203,12 +207,31 @@ const ProfilePage = () => {
           </div>
           
           <div className="p-6 flex justify-end">
-            <button
-              type="submit"
-              className="btn-primary"
-            >
-              Save Changes
-            </button>
+            {isEditing ? (
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                >
+                  Save Changes
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="btn-primary"
+              >
+                Edit Profile
+              </button>
+            )}
           </div>
         </form>
       </div>

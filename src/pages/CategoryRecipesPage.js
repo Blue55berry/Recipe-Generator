@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { getRecipesByCategory } from '../features/recipes/recipeSlice';
 import RecipeCard from '../components/RecipeCard';
 import Loader from '../components/Loader';
@@ -8,9 +8,7 @@ import Loader from '../components/Loader';
 const CategoryRecipesPage = () => {
   const { category } = useParams();
   const dispatch = useDispatch();
-  const { recipes, isLoading, isError, message } = useSelector(
-    (state) => state.recipes
-  );
+  const { recipes, isLoading, isError } = useSelector((state) => state.recipes);
 
   useEffect(() => {
     dispatch(getRecipesByCategory(category));
@@ -24,7 +22,7 @@ const CategoryRecipesPage = () => {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-          <p>{message}</p>
+          <p>Error loading recipes. Please try again.</p>
         </div>
       </div>
     );
@@ -32,20 +30,12 @@ const CategoryRecipesPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <h1 className="text-3xl font-bold text-center mb-2">{category} Recipes</h1>
-      <p className="text-center text-gray-600 mb-10">Discover delicious {category.toLowerCase()} recipes from TheMealDB</p>
-      
-      {recipes.length > 0 ? (
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {recipes.map((recipe) => (
-            <RecipeCard key={recipe._id} recipe={recipe} />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-8">
-          <p>No recipes found in this category.</p>
-        </div>
-      )}
+      <h1 className="text-3xl font-bold mb-8">{category} Recipes</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        {recipes.map((recipe) => (
+          <RecipeCard key={recipe._id} recipe={recipe} />
+        ))}
+      </div>
     </div>
   );
 };

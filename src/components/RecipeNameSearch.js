@@ -3,14 +3,14 @@ import { useDispatch } from 'react-redux';
 import { searchRecipesByName } from '../features/recipes/recipeSlice';
 import { FaSearch } from 'react-icons/fa';
 
-const RecipeNameSearch = () => {
+const RecipeNameSearch = ({ filters }) => {
   const [query, setQuery] = useState('');
   const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (query.trim()) {
-      dispatch(searchRecipesByName(query));
+      dispatch(searchRecipesByName({ query, filters }));
     }
   };
 

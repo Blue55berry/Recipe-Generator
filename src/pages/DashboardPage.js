@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { getRecommendedRecipes, getFavoriteRecipes } from '../features/recipes/recipeSlice';
@@ -7,6 +7,7 @@ import Loader from '../components/Loader';
 import { FaSearch, FaBookmark, FaHistory, FaUserCog } from 'react-icons/fa';
 
 const DashboardPage = () => {
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { recommendedRecipes, favoriteRecipes, isLoading } = useSelector(
@@ -16,6 +17,8 @@ const DashboardPage = () => {
   useEffect(() => {
     dispatch(getRecommendedRecipes());
     dispatch(getFavoriteRecipes());
+    const viewed = JSON.parse(localStorage.getItem('recentlyViewed')) || [];
+    setRecentlyViewed(viewed);
   }, [dispatch]);
 
   if (isLoading) {
@@ -51,14 +54,14 @@ const DashboardPage = () => {
           <p className="text-sm text-gray-600">Organize saved recipes</p>
         </Link>
         
-        <Link 
-          to="/history" 
+        <a 
+          href="#recently-viewed" 
           className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center text-center hover:shadow-lg transition-shadow"
         >
           <FaHistory className="text-3xl text-primary mb-3" />
           <h3 className="font-semibold mb-1">Recent Activity</h3>
-          <p className="text-sm text-gray-600">View cooking history</p>
-        </Link>
+          <p className="text-sm text-gray-600">View recently viewed recipes</p>
+        </a>
         
         <Link 
           to="/profile" 
@@ -96,7 +99,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Favorite Recipes */}
-      <div>
+      <div className="mb-10">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Your Favorites</h2>
           <Link to="/collections" className="text-primary hover:underline">
@@ -115,6 +118,25 @@ const DashboardPage = () => {
             <p>You haven't saved any favorites yet. Save recipes you love for quick access!</p>
             <Link to="/search" className="btn-primary inline-block mt-4">
               Discover Recipes
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* Recently Viewed */}
+      <div id="recently-viewed">
+        <h2 className="text-2xl font-bold mb-6">Recently Viewed</h2>
+        {recentlyViewed && recentlyViewed.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {recentlyViewed.map((recipe) => (
+              <RecipeCard key={recipe._id} recipe={recipe} />
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <p>You haven't viewed any recipes recently. Your history will appear here.</p>
+            <Link to="/search" className="btn-primary inline-block mt-4">
+              Find Recipes
             </Link>
           </div>
         )}

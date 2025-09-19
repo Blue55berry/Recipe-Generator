@@ -18,34 +18,10 @@ const searchRecipes = async (ingredients, filters, token) => {
   return response.data;
 };
 
-// Search recipes by name using TheMealDB API
+// Search recipes by name by calling our backend API
 const searchByName = async (query) => {
-  const response = await axios.get(`${MEALDB_API_URL}search.php?s=${query}`);
-  
-  // Transform the response to match our app's recipe format
-  if (response.data.meals) {
-    return response.data.meals.map(meal => ({
-      _id: meal.idMeal,
-      title: meal.strMeal,
-      description: meal.strInstructions.substring(0, 200) + '...',
-      image_url: meal.strMealThumb,
-      external_id: meal.idMeal,
-      external_source: 'themealdb',
-      category: meal.strCategory,
-      area: meal.strArea,
-      tags: [meal.strCategory, meal.strArea],
-      ingredients: extractIngredients(meal),
-      instructions: meal.strInstructions.split('\r\n').filter(step => step.trim() !== ''),
-      prep_time: 20, // Estimated as the API doesn't provide this info
-      cook_time: 30, // Estimated as the API doesn't provide this info
-      servings: 4, // Estimated as the API doesn't provide this info
-      difficulty: 'medium', // Estimated as the API doesn't provide this info
-      source_url: meal.strSource || '',
-      youtube_url: meal.strYoutube || ''
-    }));
-  }
-  
-  return [];
+  const response = await axios.post(API_URL + 'search/name', { query });
+  return response.data;
 };
 
 // Helper function to extract ingredients from TheMealDB format

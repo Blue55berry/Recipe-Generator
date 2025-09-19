@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { searchRecipes, reset, getCategories } from '../features/recipes/recipeSlice';
+import { searchRecipes, reset, getCategories, searchRecipesByName, getRecipesByCategory } from '../features/recipes/recipeSlice';
 import IngredientInput from '../components/Ingredientinput';
 import RecipeNameSearch from '../components/RecipeNameSearch';
+import CategoriesBrowser from '../components/CategoriesBrowser';
 import RecipeCard from '../components/RecipeCard';
 import Loader from '../components/Loader';
 import { FaFilter, FaSort, FaTimes, FaListAlt } from 'react-icons/fa';
 
 const SearchPage = () => {
   const [showFilters, setShowFilters] = useState(false);
-  const [activeTab, setActiveTab] = useState('ingredients'); // 'ingredients' or 'name'
+  const [activeTab, setActiveTab] = useState('ingredients'); // 'ingredients' or 'name' or 'categories'
   const [filters, setFilters] = useState({
     difficulty: '',
     maxTime: '',
@@ -57,7 +58,17 @@ const SearchPage = () => {
   };
 
   const applyFilters = () => {
-    dispatch(searchRecipes({ ingredients: [], filters }));
+    if (activeTab === 'ingredients') {
+      dispatch(searchRecipes({ ingredients: [], filters }));
+    } else if (activeTab === 'name') {
+      // If there's an active name search, re-search with the new filters
+      const searchInput = document.querySelector('input[placeholder*="recipe name"]');
+      if (searchInput && searchInput.value) {
+        dispatch(searchRecipesByName({ query: searchInput.value, filters }));
+      }
+    } else if (activeTab === 'categories' && filters.category) {
+      dispatch(getRecipesByCategory({ category: filters.category, filters }));
+    }
     setShowFilters(false);
   };
 
@@ -68,6 +79,11 @@ const SearchPage = () => {
       diet: [],
       category: ''
     });
+  };
+
+  const handleCategoryClick = (categoryName) => {
+    setFilters({...filters, category: categoryName});
+    dispatch(getRecipesByCategory({ category: categoryName, filters }));
   };
 
   return (
@@ -118,37 +134,11 @@ const SearchPage = () => {
           )}
           
           {activeTab === 'name' && (
-            <RecipeNameSearch />
+            <RecipeNameSearch filters={filters} />
           )}
           
           {activeTab === 'categories' && (
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-4">Recipe Categories</h2>
-              <div className="space-y-2">
-                {isLoading ? (
-                  <Loader />
-                ) : (
-                  categories.map((category) => (
-                    <div key={category.id} className="flex items-center">
-                      <img 
-                        src={category.image} 
-                        alt={category.name} 
-                        className="w-10 h-10 object-cover rounded-full mr-3"
-                      />
-                      <button 
-                        onClick={() => {
-                          setFilters({...filters, category: category.name});
-                          dispatch(searchRecipes({ ingredients: [], filters: {...filters, category: category.name} }));
-                        }}
-                        className="text-gray-700 hover:text-primary text-left"
-                      >
-                        {category.name}
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
+            <CategoriesBrowser />
           )}
           
           <div className="mt-8">
@@ -274,7 +264,7 @@ const SearchPage = () => {
             <div className="bg-white p-8 rounded-lg shadow-md text-center">
               <h2 className="text-xl font-semibold mb-2">No Recipes Found</h2>
               <p className="text-gray-600 mb-4">
-                Try different search terms, ingredients, or browse by category to find delicious recipes.
+                Try different search terms, ingredients, or adjust your filters to find delicious recipes.
               </p>
               <img 
                 src="/empty-plate.svg" 

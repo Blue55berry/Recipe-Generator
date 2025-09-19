@@ -12,6 +12,7 @@ import SearchPage from './pages/SearchPage';
 import RecipeDetailPage from './pages/RecipeDetailPage';
 import ProfilePage from './pages/ProfilePage';
 import CollectionsPage from './pages/CollectionsPage';
+import CollectionDetailPage from './pages/CollectionDetailPage';
 import CategoriesPage from './pages/CategoriesPage';
 import CategoryRecipesPage from './pages/CategoryRecipesPage';
 import PrivateRoute from './components/PrivateRoute';
@@ -52,6 +53,14 @@ const App = () => {
                 element={
                   <PrivateRoute>
                     <CollectionsPage />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/collections/:id" 
+                element={
+                  <PrivateRoute>
+                    <CollectionDetailPage />
                   </PrivateRoute>
                 } 
               />
