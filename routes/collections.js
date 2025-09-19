@@ -4,6 +4,7 @@ const Collection = require('../models/Collection');
 const Recipe = require('../models/Recipe');
 const { protect } = require('../middleware/auth');
 const router = express.Router();
+const axios = require('axios');
 
 // @route   GET /api/collections
 // @desc    Get all collections for a user
@@ -158,6 +159,8 @@ router.delete('/:id', protect, async (req, res) => {
   }
 });
 
+
+
 // @route   POST /api/collections/:id/recipes
 // @desc    Add recipe to collection
 // @access  Private
@@ -180,21 +183,67 @@ router.post(
         return res.status(404).json({ error: 'Collection not found' });
       }
       
-      // Check if the collection belongs to the user
       if (collection.user_id.toString() !== req.user.id) {
         return res.status(401).json({ error: 'Not authorized' });
       }
       
-      const recipeId = req.body.recipeId;
-      
-      // Check if recipe exists
-      const recipe = await Recipe.findById(recipeId);
-      if (!recipe) {
-        return res.status(404).json({ error: 'Recipe not found' });
+      let recipeId = req.body.recipeId;
+      const isMongoId = /^[0-9a-fA-F]{24}$/.test(recipeId);
+
+      // If it's not a Mongo ID, it's an external recipe that needs to be imported.
+      if (!isMongoId) {
+        // Check if this external recipe has already been imported.
+        let existingRecipe = await Recipe.findOne({ external_id: recipeId });
+
+        if (!existingRecipe) {
+          // If not, fetch from TheMealDB.
+          const response = await axios.get(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${recipeId}`);
+
+          if (!response.data.meals || response.data.meals.length === 0) {
+            return res.status(404).json({ error: 'External recipe not found' });
+          }
+
+          const meal = response.data.meals[0];
+          const ingredients = [];
+          for (let i = 1; i <= 20; i++) {
+            const ingredient = meal[`strIngredient${i}`];
+            const measure = meal[`strMeasure${i}`];
+            if (ingredient && ingredient.trim() !== '') {
+              ingredients.push({
+                name: ingredient.trim(),
+                amount: 1, // Placeholder amount
+                unit: measure ? measure.trim() : ''
+              });
+            }
+          }
+
+          // Create a new local recipe document.
+          const newRecipe = new Recipe({
+            title: meal.strMeal,
+            description: meal.strInstructions,
+            ingredients: ingredients,
+            instructions: meal.strInstructions.split(/\r\n|\n/).filter(step => step.trim() !== ''),
+            prep_time: 20, // Estimated
+            cook_time: 30, // Estimated
+            servings: 4,   // Estimated
+            image_url: meal.strMealThumb,
+            tags: meal.strTags ? meal.strTags.split(',') : [],
+            difficulty: 'medium', // Estimated
+            nutrition_info: {},
+            external_id: meal.idMeal,
+            external_source: 'themealdb',
+            user_id: req.user.id, // Associate with the user who imported it
+          });
+
+          existingRecipe = await newRecipe.save();
+        }
+        
+        // Use the local ID of the (possibly newly imported) recipe.
+        recipeId = existingRecipe._id;
       }
       
-      // Check if recipe is already in collection
-      if (collection.recipes.includes(recipeId)) {
+      // Check if recipe is already in the collection.
+      if (collection.recipes.find(r => r.toString() === recipeId.toString())) {
         return res.status(400).json({ error: 'Recipe already in collection' });
       }
       
@@ -203,7 +252,9 @@ router.post(
       
       await collection.save();
       
-      res.json(collection);
+      const populatedCollection = await Collection.findById(collection._id).populate('recipes');
+
+      res.json(populatedCollection);
     } catch (err) {
       console.error(err.message);
       

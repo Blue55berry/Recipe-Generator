@@ -20,6 +20,9 @@ const collectionRoutes = require('./routes/collections');
 
 const app = express();
 
+// Disable ETag-based caching
+app.set('etag', false);
+
 // Body parser
 app.use(express.json());
 
