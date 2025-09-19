@@ -97,7 +97,8 @@ router.get('/:id', async (req, res) => {
         const recipe = {
           _id: meal.idMeal,
           title: meal.strMeal || 'Untitled Recipe',
-          description: (meal.strInstructions || '').substring(0, 200) + '...',
+          description: meal.strInstructions || 'No description available.',
+          description_ta: '', // Initialize Tamil description
           full_description: meal.strInstructions || 'No instructions available.',
           image_url: meal.strMealThumb,
           external_id: meal.idMeal,

@@ -11,6 +11,10 @@ const RecipeSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please add a description']
   },
+  description_ta: {
+    type: String,
+    default: ''
+  },
   ingredients: [
     {
       name: {
@@ -27,9 +31,20 @@ const RecipeSchema = new mongoose.Schema({
       }
     }
   ],
+  ingredients_ta: [
+    {
+      name: { type: String },
+      amount: { type: Number },
+      unit: { type: String }
+    }
+  ],
   instructions: {
     type: [String],
     required: [true, 'Please add cooking instructions']
+  },
+  instructions_ta: {
+    type: [String],
+    default: []
   },
   prep_time: {
     type: Number,
