@@ -4,7 +4,7 @@ import { FaClock, FaUtensils } from 'react-icons/fa';
 
 const RecipeCard = ({ recipe }) => {
   return (
-    <div className="card hover:shadow-lg transition-shadow duration-300">
+    <div className="card hover:shadow-lg transition-shadow duration-300" data-aos="fade-up">
       <div className="relative">
         <img 
           src={recipe.image_url || '/images/default-recipe.jpg'} 

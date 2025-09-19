@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { FaPlus, FaTimes } from 'react-icons/fa';
 
-const IngredientInput = ({ onIngredientsSubmit }) => {
+const IngredientInput = ({ ingredients, setIngredients, onIngredientsSubmit }) => {
   const [ingredientInput, setIngredientInput] = useState('');
-  const [ingredients, setIngredients] = useState([]);
 
   const handleAddIngredient = () => {
     if (ingredientInput.trim() !== '' && !ingredients.includes(ingredientInput.trim().toLowerCase())) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { getRecommendedRecipes, getFavoriteRecipes } from '../features/recipes/recipeSlice';
 import RecipeCard from '../components/RecipeCard';
@@ -9,6 +9,8 @@ import { FaSearch, FaBookmark, FaHistory, FaUserCog } from 'react-icons/fa';
 const DashboardPage = () => {
   const [recentlyViewed, setRecentlyViewed] = useState([]);
   const dispatch = useDispatch();
+  const location = useLocation();
+  const [welcomeMessage, setWelcomeMessage] = useState(location.state?.message || '');
   const { user } = useSelector((state) => state.auth);
   const { recommendedRecipes, favoriteRecipes, isLoading } = useSelector(
     (state) => state.recipes
@@ -21,14 +23,26 @@ const DashboardPage = () => {
     setRecentlyViewed(viewed);
   }, [dispatch]);
 
-  if (isLoading) {
+  if (isLoading || !user) {
     return <Loader />;
   }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {welcomeMessage && (
+        <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-8 rounded-md shadow-md relative" role="alert">
+          <p className="font-bold">{welcomeMessage}</p>
+          <button 
+            onClick={() => setWelcomeMessage('')} 
+            className="absolute top-0 bottom-0 right-0 px-4 py-3"
+          >
+            <span className="text-2xl">&times;</span>
+          </button>
+        </div>
+      )}
+
       <div className="mb-10">
-        <h1 className="text-3xl font-bold">Welcome, {user?.name}!</h1>
+        <h1 className="text-3xl font-bold">Welcome, {user.name}!</h1>
         <p className="text-gray-600 mt-2">
           Find recipes, save your favorites, and keep track of your cooking journey.
         </p>

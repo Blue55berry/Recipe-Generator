@@ -25,7 +25,7 @@ const LoginPage = () => {
     }
 
     if (isSuccess || user) {
-      navigate('/dashboard');
+      navigate('/dashboard', { state: { message: `Welcome back, ${user.name}!` } });
     }
 
     dispatch(reset());

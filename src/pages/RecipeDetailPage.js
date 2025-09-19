@@ -16,14 +16,14 @@ import {
 
 const RecipeDetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { language } = useSelector((state) => state.language);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showCollections, setShowCollections] = useState(false);
   const [selectedCollection, setSelectedCollection] = useState('');
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'stepByStep', 'ingredients'
+  const [activeTab, setActiveTab] = useState('overview');
   const [completedSteps, setCompletedSteps] = useState([]);
   const [timer, setTimer] = useState({ active: false, seconds: 0 });
-
-  const navigate = useNavigate();
 
   const dispatch = useDispatch();
   const { recipe, isLoading, isError } = useSelector((state) => state.recipes);
@@ -212,7 +212,7 @@ const RecipeDetailPage = () => {
           <div className="flex space-x-4">
             <button 
               onClick={toggleFavorite}
-              className="flex items-center text-gray-600 hover:text-primary"
+              className="flex items-center text-gray-600 hover:text-primary transition-transform hover:scale-110"
             >
               {isFavorite ? <FaHeart className="text-primary mr-1" /> : <FaRegHeart className="mr-1" />}
               <span>{isFavorite ? 'Saved' : 'Save'}</span>
@@ -220,7 +220,7 @@ const RecipeDetailPage = () => {
             
             <button 
               onClick={handleCollectionClick}
-              className="flex items-center text-gray-600 hover:text-primary"
+              className="flex items-center text-gray-600 hover:text-primary transition-transform hover:scale-110"
             >
               <FaBookmark className="mr-1" />
               <span>Collection</span>
@@ -230,7 +230,7 @@ const RecipeDetailPage = () => {
           <div className="flex space-x-4">
             <button 
               onClick={() => window.print()}
-              className="flex items-center text-gray-600 hover:text-primary"
+              className="flex items-center text-gray-600 hover:text-primary transition-transform hover:scale-110"
             >
               <FaPrint className="mr-1" />
               <span>Print</span>
@@ -241,7 +241,7 @@ const RecipeDetailPage = () => {
                 navigator.clipboard.writeText(window.location.href);
                 alert('Link copied to clipboard!');
               }}
-              className="flex items-center text-gray-600 hover:text-primary"
+              className="flex items-center text-gray-600 hover:text-primary transition-transform hover:scale-110"
             >
               <FaShare className="mr-1" />
               <span>Share</span>
@@ -354,7 +354,7 @@ const RecipeDetailPage = () => {
               <div className="mb-8">
                 <h2 className="text-2xl font-semibold mb-4">Description</h2>
                 <p className="text-gray-700">
-                  {isExternalRecipe && recipe.full_description ? recipe.full_description : recipe.description}
+                  {language === 'ta' && recipe.description_ta ? recipe.description_ta : (isExternalRecipe && recipe.full_description ? recipe.full_description : recipe.description)}
                 </p>
               </div>
               
@@ -363,7 +363,7 @@ const RecipeDetailPage = () => {
                 <div>
                   <h2 className="text-2xl font-semibold mb-4">Ingredients</h2>
                   <ul className="space-y-2">
-                    {recipe.ingredients.map((ingredient, index) => (
+                    {(language === 'ta' && recipe.ingredients_ta && recipe.ingredients_ta.length > 0 ? recipe.ingredients_ta : recipe.ingredients).map((ingredient, index) => (
                       <li key={index} className="flex items-start">
                         <span className="h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center text-sm mr-2 mt-0.5">
                           {index + 1}
@@ -380,7 +380,7 @@ const RecipeDetailPage = () => {
                 <div>
                   <h2 className="text-2xl font-semibold mb-4">Instructions</h2>
                   <ol className="space-y-4">
-                    {recipe.instructions.map((instruction, index) => (
+                    {(language === 'ta' && recipe.instructions_ta && recipe.instructions_ta.length > 0 ? recipe.instructions_ta : recipe.instructions).map((instruction, index) => (
                       <li key={index} className="flex items-start">
                         <span className="h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center text-sm mr-2 mt-0.5">
                           {index + 1}

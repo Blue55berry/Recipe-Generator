@@ -4,7 +4,7 @@ import { FaList } from 'react-icons/fa';
 
 const CollectionCard = ({ collection }) => {
   return (
-    <div className="card transition-transform hover:scale-105">
+    <div className="card transition-transform hover:scale-105" data-aos="fade-up">
       <div className="p-5">
         <h3 className="text-lg font-semibold flex items-center">
           <FaList className="mr-2 text-primary" />

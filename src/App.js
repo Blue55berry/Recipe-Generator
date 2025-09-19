@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
@@ -18,6 +20,13 @@ import CategoryRecipesPage from './pages/CategoryRecipesPage';
 import PrivateRoute from './components/PrivateRoute';
 
 const App = () => {
+  useEffect(() => {
+    AOS.init({
+      duration: 1000, // values from 0 to 3000, with step 50ms
+      once: true, // whether animation should happen only once - while scrolling down
+    });
+  }, []);
+
   return (
     <Provider store={store}>
       <Router>

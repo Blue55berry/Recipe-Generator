@@ -9,6 +9,7 @@ import Loader from '../components/Loader';
 import { FaFilter, FaSort, FaTimes, FaListAlt } from 'react-icons/fa';
 
 const SearchPage = () => {
+  const [ingredients, setIngredients] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [activeTab, setActiveTab] = useState('ingredients'); // 'ingredients' or 'name' or 'categories'
   const [filters, setFilters] = useState({
@@ -59,7 +60,9 @@ const SearchPage = () => {
 
   const applyFilters = () => {
     if (activeTab === 'ingredients') {
-      dispatch(searchRecipes({ ingredients: [], filters }));
+      if (ingredients.length > 0) {
+        dispatch(searchRecipes({ ingredients, filters }));
+      }
     } else if (activeTab === 'name') {
       // If there's an active name search, re-search with the new filters
       const searchInput = document.querySelector('input[placeholder*="recipe name"]');
@@ -130,7 +133,11 @@ const SearchPage = () => {
         {/* Left Sidebar */}
         <div className="md:col-span-1">
           {activeTab === 'ingredients' && (
-            <IngredientInput onIngredientsSubmit={handleIngredientsSubmit} />
+            <IngredientInput 
+              ingredients={ingredients}
+              setIngredients={setIngredients}
+              onIngredientsSubmit={handleIngredientsSubmit} 
+            />
           )}
           
           {activeTab === 'name' && (
